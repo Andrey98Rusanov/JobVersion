@@ -11,7 +11,6 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       toDoData: [],
-      time: null
     };
   }
 
@@ -30,11 +29,8 @@ export default class App extends React.Component {
 
   addTask = (text, time) => {
     let newTask;
-    this.setState({
-      time: time
-    })
     if (text.split("").length !== 0 && text.split("")[0] !== " ") {
-      newTask = this.createToDoItem(text);
+      newTask = this.createToDoItem(text, time);
       this.setState(({ toDoData }) => {
         const newArr = [...toDoData, newTask];
         return {
@@ -59,10 +55,14 @@ export default class App extends React.Component {
   };
 
   onToggleEdited = (id) => {
+    console.log(this.state.toDoData)
     this.setState(({ toDoData }) => {
       const idx = toDoData.findIndex((el) => el.id === id);
       const oldTask = toDoData[idx];
-      const newTask = { ...oldTask, edited: !oldTask.edited };
+      const newTask = {
+        ...oldTask,
+        edited: !oldTask.edited,
+      };
       const before = toDoData.slice(0, idx);
       const after = toDoData.slice(idx + 1);
       const newArr = [...before, newTask, ...after];
@@ -126,7 +126,7 @@ export default class App extends React.Component {
     });
   };
 
-  createToDoItem(label) {
+  createToDoItem(label, time) {
     return {
       label,
       completed: false,
@@ -134,7 +134,17 @@ export default class App extends React.Component {
       id: this.taskId++,
       vision: true,
       date: new Date(),
+      time: time,
+      timer: [0,0,0]
     };
+  }
+
+  timeToTask = (arr, id) => {
+    const {toDoData} = this.state;
+    const idx = toDoData.findIndex((el) => el.id === id);
+    const task = toDoData[idx];
+    task.timer = arr;
+    this.setState({toDoData});
   }
 
   render() {
@@ -150,7 +160,7 @@ export default class App extends React.Component {
           onDeleted={this.deleteTask}
           onToggleCompleted={this.onToggleCompleted}
           onToggleEdited={this.onToggleEdited}
-          time={this.state.time}
+          timeToTask={this.timeToTask}
         />
         <Footer
           completedCount={completedCount}

@@ -16,7 +16,8 @@ export default class ToDoTask extends React.Component {
   };
 
   render() {
-    const { completed, edited, date } = this.props;
+    const { completed, edited, date, time, timeToTask } = this.props;
+
     let className = "item";
     if (completed) {
       className += " completed";
@@ -41,7 +42,7 @@ export default class ToDoTask extends React.Component {
           <input type="checkbox" onClick={this.props.onToggleCompleted} />
           <div className="text">{this.state.label}</div>
         </div>
-        <Timer time={this.props.time}/>
+        <Timer time={time} timeToTask={(n) => timeToTask(n)} toDoData = {this.props.toDoData} id = {this.props.id}/>
         <span className="task__time">
           {`${formatDistanceToNow(date, {
             includeSeconds: true,
