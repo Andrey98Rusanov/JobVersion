@@ -5,7 +5,7 @@ import "./ToDoForm.css";
 export default class ToDoForm extends Component {
   state = {
     label: "",
-    time: null
+    time: "00:00"
   };
 
   onLabelChange = (e) => {
@@ -26,6 +26,7 @@ export default class ToDoForm extends Component {
     this.props.onAdd(this.state.label, this.state.time);
     this.setState({
       label: "",
+      time: "00:00"
     });
   };
 
@@ -45,9 +46,14 @@ export default class ToDoForm extends Component {
             onChange={this.onLabelChange}
           />
           <input
+            type="time"
+            min="00:01"
+            value={this.state.time}
             className="addTime"
+            placeholder="hh:mm"
             onChange={this.onTimeChange}/>
-            <button type="submit"/>
+            <button className="time_button" type="submit"/>
+            <span>hh:mm</span>
         </form>
       </header>
     );

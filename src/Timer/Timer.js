@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import "./Timer.css";
+import PropTypes from "prop-types";
 
 export default class Timer extends Component {
 
   state = {
-    minutes: this.props.toDoData[this.props.id -1].timer[1],
-    seconds: this.props.toDoData[this.props.id -1].timer[2],
-    hours: this.props.toDoData[this.props.id -1].timer[0],
+    minutes: this.props.toDoData[this.findTimerId()].timer[1],
+    seconds: this.props.toDoData[this.findTimerId()].timer[2],
+    hours: this.props.toDoData[this.findTimerId()].timer[0],
     pause: false,
   };
-
 
   componentDidMount() {
     this.myInterval = setInterval(() => {
@@ -45,7 +45,6 @@ export default class Timer extends Component {
       pause: !pause,
     }));
     console.log(this.props)
-    console.log(this.props.toDoData[this.props.id -1].timer[0])
   }
 
   onRestartClick() {
@@ -54,12 +53,19 @@ export default class Timer extends Component {
       seconds: 0,
     });
   }
+  
+  findTimerId(){
+    const {toDoData, id} = this.props
+    const idx = toDoData.findIndex((el) => el.id === id)
+    return idx
+  }
 
   timeOff() {
-    const { hours, minutes } = this.state;
-    let arr = this.props.time.split(":");
-    let res = Number(arr[0]) * 60 + Number(arr[1]);
+    const { hours, minutes, seconds } = this.state;
+    const arr = this.props.time.split(":");
+    const res = Number(arr[0]) * 60 + Number(arr[1]);
     if (res === hours * 60 + minutes && this.state.pause === false) {
+      this.props.timeToTask([hours, minutes, seconds])
       this.setState(({
         pause: true,
       }));
@@ -94,3 +100,17 @@ export default class Timer extends Component {
     );
   }
 }
+
+Timer.defaultProps = {
+  toDoData: [],
+  id: 0,
+  timeToTask: () => {},
+  time: "00:00"
+};
+
+Timer.propTypes = {
+  toDoData: PropTypes.array,
+  id: PropTypes.number,
+  timeToTask: PropTypes.func,
+  time: PropTypes.string
+};

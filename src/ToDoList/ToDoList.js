@@ -31,6 +31,7 @@ ToDoList.defaultProps = {
   onToggleCompleted: () => {},
   onToggleEdited: () => {},
   onDeleted: () => {},
+  timeToTask: () => {}
 };
 
 ToDoList.propTypes = {
@@ -38,6 +39,7 @@ ToDoList.propTypes = {
   onToggleCompleted: PropTypes.func,
   onToggleEdited: PropTypes.func,
   onDeleted: PropTypes.func,
+  timeToTask: PropTypes.func
 };
 
 export default ToDoList;

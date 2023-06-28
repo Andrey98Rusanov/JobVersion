@@ -46,7 +46,7 @@ export default class ToDoTask extends React.Component {
         <span className="task__time">
           {`${formatDistanceToNow(date, {
             includeSeconds: true,
-            addSuffix: true,
+            // addSuffix: true,
           })}`}
         </span>
         <div className="task__btn">
@@ -72,6 +72,10 @@ ToDoTask.defaultProps = {
   onToggleCompleted: () => {},
   onToggleEdited: () => {},
   onDeleted: () => {},
+  toDoData: [],
+  id: 0,
+  timeToTask: () => {},
+  time: "00:00"
 };
 
 ToDoTask.propTypes = {
@@ -82,4 +86,8 @@ ToDoTask.propTypes = {
   onToggleCompleted: PropTypes.func,
   onToggleEdited: PropTypes.func,
   onDeleted: PropTypes.func,
+  toDoData: PropTypes.array,
+  id: PropTypes.number,
+  timeToTask: PropTypes.func,
+  time: PropTypes.string
 };

@@ -29,7 +29,7 @@ export default class App extends React.Component {
 
   addTask = (text, time) => {
     let newTask;
-    if (text.split("").length !== 0 && text.split("")[0] !== " ") {
+    if (text.split("").length !== 0 && text.split("")[0] !== " " && time) {
       newTask = this.createToDoItem(text, time);
       this.setState(({ toDoData }) => {
         const newArr = [...toDoData, newTask];
@@ -126,7 +126,15 @@ export default class App extends React.Component {
     });
   };
 
-  createToDoItem(label, time) {
+  timeToTask = (arr, id) => {
+    const {toDoData} = this.state;
+    const idx = toDoData.findIndex((el) => el.id === id);
+    const task = toDoData[idx];
+    task.timer = arr;
+    this.setState({toDoData});
+  }
+
+  createToDoItem(label, taskTime) {
     return {
       label,
       completed: false,
@@ -134,17 +142,9 @@ export default class App extends React.Component {
       id: this.taskId++,
       vision: true,
       date: new Date(),
-      time: time,
+      time: taskTime,
       timer: [0,0,0]
     };
-  }
-
-  timeToTask = (arr, id) => {
-    const {toDoData} = this.state;
-    const idx = toDoData.findIndex((el) => el.id === id);
-    const task = toDoData[idx];
-    task.timer = arr;
-    this.setState({toDoData});
   }
 
   render() {
