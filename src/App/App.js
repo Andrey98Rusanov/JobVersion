@@ -54,14 +54,15 @@ export default class App extends React.Component {
     });
   };
 
-  onToggleEdited = (id) => {
-    console.log(this.state.toDoData)
+  onToggleEdited = (id, label) => {
     this.setState(({ toDoData }) => {
+      console.log(this.state)
       const idx = toDoData.findIndex((el) => el.id === id);
       const oldTask = toDoData[idx];
       const newTask = {
         ...oldTask,
         edited: !oldTask.edited,
+        label: label
       };
       const before = toDoData.slice(0, idx);
       const after = toDoData.slice(idx + 1);

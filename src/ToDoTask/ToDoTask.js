@@ -2,12 +2,59 @@ import React from "react";
 import "./ToDoTask.css";
 import PropTypes from "prop-types";
 import { formatDistanceToNow } from "date-fns";
-import Timer from "../Timer/Timer";
 
 export default class ToDoTask extends React.Component {
   state = {
     label: this.props.label,
+    minutes: this.props.toDoData[this.findTimerId()].timer[1],
+    seconds: this.props.toDoData[this.findTimerId()].timer[2],
+    hours: this.props.toDoData[this.findTimerId()].timer[0],
+    pause: false,
   };
+
+  componentDidMount() {
+    document.addEventListener('click', this.handleClickOutside.bind(this), true);
+    this.myInterval = setInterval(() => {
+      const { hours, minutes, seconds, pause } = this.state;
+      if (pause !== true) {
+        this.props.timeToTask([hours, minutes, seconds]);
+        this.setState(({ seconds }) => ({
+          seconds: seconds + 1,
+        }));
+      }
+      if (seconds === 59) {
+        this.setState(({ minutes }) => ({
+          minutes: minutes + 1,
+          seconds: 0,
+        }));
+      }
+      if (minutes === 59 && seconds === 59) {
+        this.setState(({ hours }) => ({
+          hours: hours + 1,
+          minutes: 0,
+          seconds: 0,
+        }));
+      }
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handleClickOutside.bind(this), true);
+    clearInterval(this.myInterval);
+  }
+
+  onStopClick() {
+    this.setState(({ pause }) => ({
+      pause: !pause,
+    }));
+  }
+
+  onRestartClick() {
+    this.setState({
+      minutes: 0,
+      seconds: 0,
+    });
+  }
 
   onChange = (e) => {
     this.setState({
@@ -15,8 +62,37 @@ export default class ToDoTask extends React.Component {
     });
   };
 
+  timeOff() {
+    const { hours, minutes, seconds } = this.state;
+    const arr = this.props.time.split(":");
+    const res = Number(arr[0]) * 60 + Number(arr[1]);
+    if (res === minutes * 60 + seconds && this.state.pause === false) {
+      this.props.timeToTask([hours, minutes, seconds]);
+      this.setState({
+        pause: true,
+      });
+    }
+    return res;
+  }
+
+  findTimerId() {
+    const { toDoData, id } = this.props;
+    const idx = toDoData.findIndex((el) => el.id === id);
+    return idx;
+  }
+
+handleClickOutside (event) {
+    const domNode = document.querySelector(".edited");
+    if (domNode) {
+      if (!domNode.contains(event.target) && this.props.edited) {
+          this.setState({label: this.props.label})
+          this.props.onToggleEdited(this.props.label)
+      } 
+    }
+}
+
   render() {
-    const { completed, edited, date, time, timeToTask } = this.props;
+    const { completed, edited, date } = this.props;
 
     let className = "item";
     if (completed) {
@@ -36,13 +112,36 @@ export default class ToDoTask extends React.Component {
           />
         </form>
       );
+
+    const { hours, minutes, seconds, pause } = this.state;
+    const startClass = pause ? "bi bi-skip-start" : "bi bi-stop-fill";
+    const timeLimit =
+      minutes * 60 + seconds === this.timeOff() ? (
+        "time off"
+      ) : (
+        <span>
+          {hours < 10 ? `0${hours}` : hours}:
+          {minutes < 10 ? `0${minutes}` : minutes}:
+          {seconds < 10 ? `0${seconds}` : seconds}
+        </span>
+      );
+
     return (
       <div className="task">
         <div className={className}>
           <input type="checkbox" onClick={this.props.onToggleCompleted} />
           <div className="text">{this.state.label}</div>
         </div>
-        <Timer time={time} timeToTask={(n) => timeToTask(n)} toDoData = {this.props.toDoData} id = {this.props.id}/>
+        <div className="Timer">
+          {timeLimit}
+          {timeLimit === "time off" ? null : (
+            <button className={startClass} onClick={() => this.onStopClick()} />
+          )}
+          <button
+            className="bi bi-arrow-repeat"
+            onClick={() => this.onRestartClick()}
+          />
+        </div>
         <span className="task__time">
           {`${formatDistanceToNow(date, {
             includeSeconds: true,
@@ -52,7 +151,7 @@ export default class ToDoTask extends React.Component {
         <div className="task__btn">
           <button
             className="bi bi-pencil-fill"
-            onClick={this.props.onToggleEdited}
+            onClick={() => this.props.onToggleEdited(this.state.label)}
           />
           <button
             className="bi bi-trash3-fill"
@@ -75,7 +174,7 @@ ToDoTask.defaultProps = {
   toDoData: [],
   id: 0,
   timeToTask: () => {},
-  time: "00:00"
+  time: "00:00",
 };
 
 ToDoTask.propTypes = {
@@ -89,5 +188,5 @@ ToDoTask.propTypes = {
   toDoData: PropTypes.array,
   id: PropTypes.number,
   timeToTask: PropTypes.func,
-  time: PropTypes.string
+  time: PropTypes.string,
 };
